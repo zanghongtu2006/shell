@@ -1,0 +1,10 @@
+jenkins-local:
+  image: jenkins
+  ports:
+    - "18181:8080"
+    - "50000:50000"
+  volumes:
+    - "/usr/bin/docker:/usr/bin/docker"
+    - "/var/lib/docker:/var/lib/docker"
+    - "/usr/bin/docker-compose:/usr/bin/docker-compose"
+    - "/opt/jenkins:/var/jenkins_home"
