@@ -1,5 +1,5 @@
 jenkins-local:
-  image: jenkins
+  image: jenkins/jenkins
   ports:
     - "18181:8080"
     - "50000:50000"
