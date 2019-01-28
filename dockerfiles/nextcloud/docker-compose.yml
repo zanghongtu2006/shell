@@ -1,0 +1,9 @@
+version: '2'
+services:
+  nextcloud:
+      image: 'nextcloud:15'
+      ports:
+          - "8882:80"
+      volumes:
+          - /opt/nextcloud:/var/www/html/data/
+      restart: always

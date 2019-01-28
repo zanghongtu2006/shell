@@ -1,0 +1,11 @@
+version: '2'
+services:
+  nextcloud:
+      image: 'onlyoffice/documentserver:5.2.7.2'
+      ports:
+          - "8883:80"
+          - "8884:443"
+      volumes:
+          - /opt/onlyoffice/var/log:/var/log/onlyoffice
+          - /opt/onlyoffice/var/www/onlyoffice/Data:/var/www/onlyoffice/Data
+      restart: always

@@ -1,0 +1,13 @@
+version: '2'
+services:
+  nextcloud:
+      image: 'collabora/code'
+      ports:
+        - "9980:9980"
+      environment:
+        domain: 127\\.0\\.0\\.1:8882
+        username: admin
+        password: 123456
+      volumes:
+        - /opt/nextcloud:/var/www/html/data/
+      restart: always
