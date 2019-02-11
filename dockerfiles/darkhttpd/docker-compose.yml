@@ -1,0 +1,9 @@
+version: '2'
+services:
+  darkhttpd:
+      image: 'zanghongtu2006/darkhttpd:ubuntu16.04'
+      ports:
+        - "8080:80"
+      volumes:
+        - /opt/darkhttpd/data:/opt/data
+      restart: always
