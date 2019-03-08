@@ -1,0 +1,130 @@
+version: '3'
+services:
+  sonar-mysql:
+    image: mysql:5.6
+    volumes:
+      - /opt/sonar/mysql/data:/var/lib/mysql
+      - /opt/sonar/mysql/etc/mysql:/etc/mysql
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=password
+    networks:
+      sonar:
+        ipv4_address: 172.25.0.2
+    restart: always
+
+  sonar-server:
+    image: sonarqube:7.6-community
+    ports:
+      - 9000:9000
+    volumes:
+      # all these dirs belongs to user 999:999
+      - /opt/sonar/sonar/conf:/opt/sonarqube/conf
+      - /opt/sonar/sonar/data:/opt/sonarqube/data
+      - /opt/sonar/sonar/logs:/opt/sonarqube/logs
+      - /opt/sonar/sonar/extensions:/opt/sonarqube/extensions
+    environment:
+      - sonar.jdbc.username=root
+      - sonar.jdbc.password=password
+      - sonar.jdbc.url=jdbc:mysql://sonar-mysql:3306/sonar?useUnicode=true&characterEncoding=utf8
+      - sonar.login=admin
+      - sonar.password=admin
+    links:
+      - sonar-mysql
+    depends_on:
+      - sonar-mysql
+    networks:
+      sonar:
+        ipv4_address: 172.25.0.3
+    restart: always
+
+  jenkins-server:
+    image: jenkins/jenkins:2.166
+    ports:
+      - 18181:8080
+      - 50000:50000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/uddddddddddddddsr/bin/docker
+      - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose
+      - /usr/lib/x86_64-linux-gnu/libltdl.so.7:/usr/lib/x86_64-linux-gnu/libltdl.so.7
+      # this dir belongs to user 1000:1000
+      - /opt/sonar/jenkins:/var/jenkins_home
+    links:
+      - sonar-server
+    depends_on:
+      - sonar-server
+    networks:
+      sonar:
+        ipv4_address: 172.25.0.4
+    extra_hosts:
+      - sonar.devops.c.citic:10.247.33.77
+    restart: always
+
+  zentao-server:
+    image: zanghongtu2006/zentao
+    ports:
+      - 18182:80
+    volumes:
+      - /opt/sonar/zentao/data/www:/app/zentaopms
+    links:
+      - sonar-mysql
+      - jenkins-server
+    depends_on:
+      - sonar-mysql
+      - jenkins-server
+    networks:
+      sonar:
+        ipv4_address: 172.25.0.5
+    restart: always
+#
+#  nginx:
+#      image: nginx:1.15
+#      ports:
+#        - 18183:80
+#      volumes:
+#        - /opt/sonar/nginx/etc:/etc/nginx
+#      depends_on:
+#        - jenkins-server
+#      links:
+#        - jenkins-server
+#      networks:
+#        sonar:
+#          ipv4_address: 172.25.0.6
+#      restart: always
+
+  wiki2:
+    image: 'nickstenning/mediawiki'
+    ports:
+      - 18083:80
+    depends_on:
+      - sonar-mysql
+    links:
+      - sonar-mysql
+    volumes:
+      - /opt/sonar/wiki/data:/data
+    networks:
+      sonar:
+        ipv4_address: 172.25.0.7
+    restart: always
+
+  nextcloud:
+    image: 'nextcloud:15'
+    ports:
+      - 18084:80
+    depends_on:
+      - sonar-mysql
+    links:
+      - sonar-mysql
+    volumes:
+      - /opt/sonar/nextcloud/data:/var/www/html/data/
+    networks:
+      sonar:
+        ipv4_address: 172.25.0.8
+    restart: always
+
+networks:
+  sonar:
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
