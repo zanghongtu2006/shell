@@ -1,0 +1,24 @@
+version: '2'
+services:
+  keycloak:
+    depends_on:
+      - db
+    image: jboss/keycloak:6.0.1
+    restart: always
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      DB_VENDOR: mysql
+      DB_ADDR: db
+      DB_DATABASE: keycloak
+    networks: keycloak
+
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+    networks: keycloak
